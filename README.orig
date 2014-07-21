@@ -1,0 +1,10 @@
+Automatically identify buffer's language and set the spell lang
+
+It detects the language based on the buffer contents through 'mguesser'
+(http://www.mnogosearch.org/guesser/), which in turn uses "N-Gram-Based Text
+Categorization".
+
+Author: Douglas A. Augusto (daaugusto@gmail.com)
+
+License: GNU General Public License (GPL) version 3 (or later)
+         (http://www.gnu.org/licenses/gpl.txt)
