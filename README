@@ -2,4 +2,4 @@ This is a mirror of http://www.vim.org/scripts/script.php?script_id=4988
 
 SpellLangIdentifier detects the language based on the buffer contents through 'mguesser' (http://www.mnogosearch.org/guesser/), which in turn uses "N-Gram-Based Text Categorization".
 
-Author: Douglas A. Augusto
+Git repository: https://github.com/daaugusto/spelllangidentifier

@@ -9,59 +9,15 @@
 "
 "       Author: Douglas A. Augusto (daaugusto@gmail.com)
 "
-"      Version: 0.1.0
-"
-"  Last change: July 20, 2014
+"      Version: 0.2.0
 "
 "      License: GNU GPL version 3 or later <www.gnu.org/licenses/gpl.html>
 "
-"          URL: www.vim.org
+"          URL: http://www.vim.org/scripts/script.php?script_id=4988
 "
-" Installation: Copy the plug-in (SpellLangIdentifier.vim) and the accompanying
-"               script (LanguageIdentifier.sh) files into Vim's plug-in directory
-"               (usually $HOME/.vim/plugin/ or something like that)
+"  Installation
+"      & Usage: Please see README file
 "
-"               mguesser needs to be installed (http://www.mnogosearch.org/guesser/)
-"               and reachable through $PATH (or its path configured by variables
-"               g:sliPath (mguesser's executable) and g:sliMaps (language maps)
-"
-"               It is recommended to put mguesser executable inside the directory
-"               $HOME/.vim/plugin/mguesser/ and the mappings into
-"               $HOME/.vim/plugin/mguesser/maps/
-"
-"        Usage:
-"
-"           1) Calling the language identifier command directly:
-"              :{range}SpellLangIdentify   " identify the language based on
-"                                          " {range} lines (default is the whole buffer)
-"
-"           2) Via auto commands and mappings (.vimrc):
-"
-"              " Detects document's language and sets spell checking when
-"                reading a .tex file
-"              autocmd BufRead *.tex SpellLangIdentify setlocal spell
-"
-"              " Identifies current paragraph's language and sets the spell
-"                checking whenever leaving insert mode
-"              autocmd InsertLeave *.tex '{,'}SpellLangIdentify setlocal spell
-"
-"              Recommended mappings:
-"                 " normal mode
-"                 map <F6> :.SpellLangIdentify setlocal spell<CR>:set spl<CR>
-"                 map <F7> :'{,'}SpellLangIdentify setlocal spell<CR>:set spl<CR>
-"                 map <F8> :%SpellLangIdentify setlocal spell<CR>:set spl<CR>
-"                 " insert mode
-"                 imap <F6> <C-\><C-O>:.SpellLangIdentify setlocal spell<CR><C-\><C-O>:set spl<CR>
-"                 imap <F7> <C-\><C-O>:'{,'}SpellLangIdentify setlocal spell<CR><C-\><C-O>:set spl<CR>
-"                 imap <F8> <C-\><C-O>:%SpellLangIdentify setlocal spell<CR><C-\><C-O>:set spl<CR>
-"
-"              Settings example:
-"                 let g:sliPath = "-path ~/.vim/plugin/mguesser/mguesser"
-"                 "let g:sliMaps = "-maps ..."
-"                 let g:sliLangs = "-langs 'en|pt'"
-"                 let g:sliNLangs = "1"
-"                 let g:sliSubs = "-subs 's/^pt-br$|^pt-pt$/pt/;'"
-"                 "leg g:sliRaw = "-raw"
 
 " ==============================================================================
 " Has this plugin already been loaded?
@@ -108,16 +64,16 @@ function! <SID>SpellLangIdentify( cmd ) range
    " Run the command and execute its output
    let lang = system(s:sliScriptPath . " " . g:sliPath . " " . g:sliMaps . " " . g:sliLangs . " " . g:sliNLangs . " " . g:sliSubs . " " . g:sliRaw . " " . shellescape(expand('%:t')), input)
 
-   if len(lang) > 1
-      silent execute ":setlocal spelllang=" . lang
-      execute a:cmd
-   else
-      " If input length is 0 (counting only useful data) then the identification
-      " has failed because there is not enough information. But when the length
-      " is greater then zero probably an error has occurred.
-      let input = substitute(input,'[^[:alpha:]]','','g')
-      if strlen(input) > 0
-         echo "[SpellLangIdentifier] Unable to automatically identify text's language."
+   if !empty(lang) " If input length is 0 then the identification has failed because there is not enough information (soft error).
+      if lang != "ERROR"
+         " Set the spell language(s) based on the guessing
+         silent execute ":setlocal spelllang=" . lang . "\n"
+         " Execute the user given arguments now the language is identified
+         execute a:cmd
+
+         "set spelllang
+      else " hard error
+         echoe "[SpellLangIdentifier] An error has occurred while running 'mguesser'!"
       endif
    endif
 endfunction
