@@ -91,9 +91,11 @@ function! <SID>SpellLangIdentify( cmd ) range
    endif
 
    " Run the command and execute its output
-   let lang = system(s:sliScriptPath . " " . g:sliPath . " " . g:sliMaps . " " . g:sliLangs . " " . g:sliNLangs . " " . g:sliSubs . " " . "-type " . string(type) . " " . shellescape(expand('%:t')), input)
+   silent let lang = system(s:sliScriptPath . " " . g:sliPath . " " . g:sliMaps . " " . g:sliLangs . " " . g:sliNLangs . " " . g:sliSubs . " " . "-type " . string(type) . " " . shellescape(expand('%:t')), input)
 
-   if !empty(lang) " If input length is 0 then the identification has failed because there is not enough information (soft error).
+   if v:shell_error
+      echoe "[SpellLangIdentifier] Error at '" . s:sliScriptPath . "' (" . lang . ")"
+   elseif !empty(lang) " If input length is 0 then the identification has failed because there is not enough information (soft error).
       if lang != "ERROR"
          " Set the spell language(s) based on the guessing
          silent execute ":setlocal spelllang=" . lang . "\n"
@@ -102,7 +104,7 @@ function! <SID>SpellLangIdentify( cmd ) range
 
          "set spelllang
       else " hard error
-         echoe "[SpellLangIdentifier] An error has occurred while running 'mguesser'!"
+         echoe "[SpellLangIdentifier] Error at 'mguesser'"
       endif
    endif
 endfunction
